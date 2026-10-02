@@ -37,6 +37,29 @@ Para cada aula ou entrega, registre abaixo:
 | 25/09/2026 | Correção GET beneficiários (pós Aula 07) | Claude | "O professor mandou uma correção da busca por beneficiários (GET) pelo Swagger, não entendi o que significa" | Usado para entender o problema do `Pageable` no Swagger UI e o código enviado pelo professor. A aplicação do código do professor e o tratamento 400 para ordenação por campo inexistente também foram feitos com o Claude e revisados por mim. |
 | 25/09/2026 | Correção GET beneficiários (pós Aula 07) | Claude | "Preencha o modelo de pull request (`.github/pull_request_template.md`) com as mudanças desta entrega" | Descrição do PR `.github/pull-requests/PR-fix-busca-beneficiarios-swagger.md` gerada integralmente pelo Claude a partir das mudanças da entrega; revisada por mim. |
 
+| 02/10/2026 | Avaliação A1 | Claude (Cursor) | Enunciado completo da A1 (módulo de Produtos) + "Ao final de tudo, explique para mim tudo que foi inserido" | Código do módulo `produtos` (Entity, migration V4, DTOs, `@EstoqueNaoNegativo`, Service, Controller, handlers 409/422), testes, README e esta linha gerados pelo Claude seguindo os padrões dos módulos existentes; revisados e estudados por mim a partir da explicação gerada. |
+
+---
+
+## Declaração de Uso de IA (A1)
+
+### Ferramentas utilizadas:
+- [x] ChatGPT / Claude / Gemini — Claude, via agente do Cursor
+- [ ] Copilot / Codeium
+- [ ] Nenhuma
+
+### Como utilizei:
+- Usei IA para gerar a implementação do módulo de Produtos (Entity, migration Flyway, DTOs, validação customizada, Service, Controller e tratamento de erros) seguindo os padrões já existentes em `beneficiarios` e `doacoes`.
+- Usei IA para gerar os testes unitários (`ProdutoServiceTest`) e de integração (`ProdutoControllerIntegrationTest`).
+- Usei IA para reescrever o README com os endpoints de Produtos.
+- Usei IA para me explicar cada decisão do código (por exemplo, por que estoque negativo retorna 422 e não 400).
+
+### O que eu entendo 100%:
+- _(preencher)_
+
+### O que precisei estudar mais:
+- _(preencher)_
+
 ---
 
 _Declaração: Ao submeter este repositório, confirmo que todo o código foi
