@@ -1,5 +1,6 @@
 package br.com.socialconnect.api.exception;
 
+import br.com.socialconnect.api.validation.EstoqueNaoNegativo;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.core.PropertyReferenceException;
@@ -29,11 +30,20 @@ public class GlobalExceptionHandler {
     }
 
     // 400 - Bean Validation
+    // 422 - quando a única violação é de regra de negócio (@EstoqueNaoNegativo): o formato está correto,
+    //       mas o conteúdo não pode ser processado
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ProblemDetail> handleValidation(MethodArgumentNotValidException ex, WebRequest request) {
-        List<ProblemDetail.FieldError> errors = ex.getBindingResult().getFieldErrors().stream()
+        List<org.springframework.validation.FieldError> fieldErrors = ex.getBindingResult().getFieldErrors();
+        List<ProblemDetail.FieldError> errors = fieldErrors.stream()
                 .map(e -> new ProblemDetail.FieldError(e.getField(), e.getDefaultMessage()))
                 .toList();
+        boolean somenteEstoqueNegativo = !fieldErrors.isEmpty() && fieldErrors.stream()
+                .allMatch(e -> EstoqueNaoNegativo.class.getSimpleName().equals(e.getCode()));
+        if (somenteEstoqueNegativo) {
+            return build(HttpStatus.UNPROCESSABLE_CONTENT, "estoque-negativo", "Estoque negativo",
+                    mensagem("erro.estoque.negativo"), request, errors);
+        }
         return build(HttpStatus.BAD_REQUEST, "validacao", "Erro de validação",
                 mensagem("erro.validacao"), request, errors);
     }
@@ -64,6 +74,21 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ProblemDetail> handleCpfDuplicado(CpfDuplicadoException ex, WebRequest request) {
         return build(HttpStatus.CONFLICT, "cpf-duplicado", "CPF já cadastrado",
                 mensagem("cpf.duplicado", ex.getCpf()), request, List.of());
+    }
+
+    // 409 - nome de produto duplicado
+    @ExceptionHandler(ProdutoDuplicadoException.class)
+    public ResponseEntity<ProblemDetail> handleProdutoDuplicado(ProdutoDuplicadoException ex, WebRequest request) {
+        return build(HttpStatus.CONFLICT, "produto-duplicado", "Produto já cadastrado",
+                mensagem("produto.duplicado", ex.getNome()), request, List.of());
+    }
+
+    // 422 - operação deixaria o estoque negativo
+    @ExceptionHandler(EstoqueNegativoException.class)
+    public ResponseEntity<ProblemDetail> handleEstoqueNegativo(EstoqueNegativoException ex, WebRequest request) {
+        return build(HttpStatus.UNPROCESSABLE_CONTENT, "estoque-negativo", "Estoque negativo",
+                mensagem("erro.estoque.negativo"), request,
+                List.of(new ProblemDetail.FieldError("estoqueAtual", mensagem("produto.estoque.negativo"))));
     }
 
     // 404 - recurso não encontrado
